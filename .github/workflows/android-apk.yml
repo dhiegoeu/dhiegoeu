@@ -23,7 +23,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest already ships the Android SDK (ANDROID_HOME). Accepting the licenses lets
+      # Gradle download any platform/build-tools it needs. `|| true`: `yes` dies of SIGPIPE.
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
       - run: npm ci
       - run: npm run typecheck && npm test
       - name: Generate native Android project
