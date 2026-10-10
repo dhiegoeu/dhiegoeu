@@ -25,6 +25,26 @@ celular ──(upload mp4)──▶ servidor ──▶ ffmpeg ─▶ acordes (cr
    endereço do backend: no celular, o IP do computador na sua rede (ex. `http://192.168.0.10:8000`);
    no emulador Android, `http://10.0.2.2:8000`.
 
+## Instalar no Android (APK)
+
+O app precisa de um servidor acessível pelo celular (veja `backend/README.md`): o computador na
+mesma rede Wi‑Fi ou um servidor na internet. Depois, gere o APK por um destes caminhos:
+
+- **GitHub Actions (sem instalar nada):** aba *Actions* → *Build Android APK* → *Run workflow*.
+  Ao terminar, baixe o artefato `cifra-apk`, descompacte, envie o `.apk` ao celular e abra-o
+  (permita "instalar apps de fontes desconhecidas" quando o Android pedir).
+- **EAS Build (nuvem da Expo, conta gratuita):**
+  ```bash
+  cd mobile && npm install -g eas-cli && eas login
+  eas build -p android --profile preview   # ao final, mostra o link de download do .apk
+  ```
+- **Local** (precisa de JDK 17 e Android SDK): `cd mobile && npx expo prebuild --platform android && cd android && ./gradlew assembleRelease`;
+  o APK fica em `android/app/build/outputs/apk/release/`.
+
+O APK é assinado com a chave de depuração, o que serve para instalar direto no celular; para
+publicar na Play Store use `--profile production` e uma chave própria. O Android do app aceita
+`http://` (necessário para um servidor na rede local); com um servidor HTTPS isso não é usado.
+
 ## Recursos do app
 
 - Escolher arquivo (mp4, m4a, mp3, wav…) e idioma da letra

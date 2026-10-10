@@ -1,0 +1,37 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/mobile-app-music-chords-35f79z"]
+    paths: ["mobile/**", ".github/workflows/android-apk.yml"]
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npm run typecheck && npm test
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install
+      - name: Build release APK
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cifra-apk
+          path: mobile/android/app/build/outputs/apk/release/*.apk
